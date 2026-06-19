@@ -24,14 +24,19 @@ PAGE_TITLES = {
 HOBBIES = {
     "ruth": [
         {
-            "name": "Hobby One",
-            "description": "A short description of this hobby and why Ruth enjoys it.",
-            "image": "img/hobbies/ruth/hobby1.jpg",
+            "name": "Photography",
+            "description": "I love doing event and portrait photography and love meeting new people!",
+            "image": "img/hobbies/ruth/photography.jpg",
         },
         {
-            "name": "Hobby Two",
-            "description": "A short description of this hobby and why Ruth enjoys it.",
-            "image": "img/hobbies/ruth/hobby2.jpg",
+            "name": "Hiking",
+            "description": "I love to explore new trails and go to different states!",
+            "image": "img/hobbies/ruth/hiking.jpeg",
+        },
+        {
+            "name": "Concerts",
+            "description": "I love listening to live music and have seen Jhene Aiko, Bad Bunny, Karol G, Kaytranada, Andre 3000, Cleo Sol, and more!",
+            "image": "img/hobbies/ruth/concert.jpeg",
         },
     ],
     "thrinayani": [
