@@ -20,3 +20,36 @@ PAGE_TITLES = {
     "projects":   "Projects",
     "hobbies":    "Hobbies",
 }
+
+EXPERIENCES = [
+    {
+        "company": "Company Name",
+        "role": "Your Job Title",
+        "dates": "Month Year – Month Year",
+        "bullets": [
+            "Describe a key accomplishment or responsibility here.",
+            "Another impact you had — quantify it if you can.",
+            "One more highlight from this role.",
+        ],
+    },
+    {
+        "company": "Another Company",
+        "role": "Your Role",
+        "dates": "Month Year – Month Year",
+        "bullets": [
+            "What you built, shipped, or improved.",
+            "A skill or tool you used heavily.",
+        ],
+    },
+]
+
+EDUCATION = [
+    {
+        "school": "University Name",
+        "degree": "Bachelor of Science in Computer Science",
+        "dates": "Year – Year",
+        "highlights": [
+            "Relevant coursework, honor, or activity worth mentioning.",
+        ],
+    },
+]
