@@ -1,0 +1,18 @@
+<!-- Navbar component. nav_links and active_page are injected via context processor / route. -->
+<header class="nav-bar">
+    <div class="nav-content">
+        <a href="/">
+            <div class="nav-logo">
+                <img src="/static/img/logo.svg" />
+            </div>
+        </a>
+        <nav>
+            {% for link in nav_links %}
+                <a href="{{ link.href }}"
+                   class="nav-link {% if active_page == link.key %}active{% endif %}">
+                    {{ link.label }}
+                </a>
+            {% endfor %}
+        </nav>
+    </div>
+</header>

@@ -1,15 +1,120 @@
-# Production Engineering - Week 1 - Portfolio Site
+# Production Engineering – Week 1 – Portfolio Site
 
-Welcome to the MLH Fellowship! During Week 1, you'll be using Flask to build a portfolio site. This site will be the foundation for activities we do in future weeks so spend time this week making it your own and reflect your personality!
+A personal portfolio built with Flask as part of the MLH Fellowship. Week 1 focuses on getting the app running locally; hosting in the cloud comes in later weeks.
 
-## Tasks
+---
 
-Once you've got your portfolio downloaded and running using the instructions below, you should attempt to complete the following tasks.
+## Project Structure
 
-For each of these tasks, you should create an [Issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues) and work on them in a new [branch](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches). When the task has been completed, you should open a [Pull Request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) and get another fellow in your pod to give you feedback before merging it in.
+```
+pe-portfolio-submission/
+├── app/
+│   ├── __init__.py          # App factory, route definitions, context processor
+│   ├── constants.py         # All static strings (page titles, nav links)
+│   ├── static/
+│   │   ├── img/
+│   │   │   ├── favicon.ico
+│   │   │   ├── logo.jpg     # Profile picture
+│   │   │   └── logo.svg     # Navbar logo
+│   │   └── styles/
+│   │       └── main.css     # Global styles
+│   └── templates/
+│       ├── base.html        # Shared layout (head, navbar, content block)
+│       └── components/
+│           ├── navbar.html  # Navbar — loops over NAV_LINKS from constants
+│           ├── home.html    # Home page content
+│           ├── about.html   # About page content
+│           ├── experience.html
+│           ├── projects.html
+│           └── hobbies.html
+├── example.env              # Template for environment variables
+├── requirements.txt         # Python dependencies
+└── README.md
+```
 
-*Note: Make sure to include a link to the Issue you're progressing on inside of your Pull Request so your reviewer knows what you're progressing on!*
+### How templates are wired together
 
+```
+base.html
+ ├── includes → components/navbar.html   (rendered on every page)
+ └── block content
+      └── filled by each page component (home.html, about.html, …)
+```
+
+Each page component (`components/*.html`) extends `base.html` and fills the `content` block. Adding a new page means creating a new component, registering a route in `__init__.py`, and adding an entry to `NAV_LINKS` in `constants.py`.
+
+---
+
+## Prerequisites
+
+- Python 3.8+
+- pip
+
+---
+
+## Setup
+
+1. **Clone the repo**
+   ```bash
+   git clone <repo-url>
+   cd pe-portfolio-submission
+   ```
+
+2. **Create and activate a virtual environment**
+   ```bash
+   python -m venv venv
+   # macOS / Linux
+   source venv/bin/activate
+   # Windows
+   venv\Scripts\activate
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Set up environment variables**
+   ```bash
+   cp example.env .env
+   ```
+   The default `.env` sets `URL=localhost:5000`. Edit it if needed.
+
+---
+
+## Running Locally
+
+```bash
+export FLASK_APP=app        # Windows: set FLASK_APP=app
+export FLASK_ENV=development
+flask run
+```
+
+The app will be available at `http://localhost:5000`.
+
+| Route         | Page       |
+|---------------|------------|
+| `/`           | Home       |
+| `/about`      | About      |
+| `/experience` | Experience |
+| `/projects`   | Projects   |
+| `/hobbies`    | Hobbies    |
+
+---
+
+## Adding a New Page
+
+1. Add an entry to `NAV_LINKS` in `app/constants.py` (and a `PAGE_TITLES` entry).
+2. Create `app/templates/components/<page>.html` extending `base.html`.
+3. Add a route in `app/__init__.py`.
+
+---
+
+## Contributing
+
+Pull requests are welcome. For major changes please open an issue first to discuss what you'd like to change.
+
+## Checklist
 ### GitHub Tasks
 - [x] Create Issues for each task below
 - [x] Progress on each task in a new branch
@@ -30,50 +135,4 @@ For each of these tasks, you should create an [Issue](https://docs.github.com/en
 - [x] Add a menu bar that dynamically displays other pages in the app
 
 
-## Getting Started
 
-You need to do all your progress here.
-
-## Installation
-
-Make sure you have python3 and pip installed
-
-Create and activate virtual environment using virtualenv
-```bash
-$ python -m venv python3-virtualenv
-$ source python3-virtualenv/bin/activate
-```
-
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install all dependencies!
-
-```bash
-pip install -r requirements.txt
-```
-
-## Usage
-
-Create a .env file using the example.env template (make a copy using the variables inside of the template)
-
-Start flask development server
-```bash
-$ export FLASK_ENV=development
-$ flask run
-```
-
-You should get a response like this in the terminal:
-```
-❯ flask run
- * Environment: development
- * Debug mode: on
- * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
-```
-
-You'll now be able to access the website at `localhost:5000` or `127.0.0.1:5000` in the browser! 
-
-*Note: The portfolio site will only work on your local machine while you have it running inside of your terminal. We'll go through how to host it in the cloud in the next few weeks!* 
-
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
