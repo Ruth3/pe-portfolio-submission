@@ -24,26 +24,4 @@
     </div>
     {% endfor %}
 </div>
-
-<div class="section-container">
-    <h2 class="section-title">Education</h2>
-    {% for edu in education %}
-    <div class="experience-card">
-        <div class="experience-header">
-            <div>
-                <h3 class="experience-role">{{ edu.degree }}</h3>
-                <span class="experience-company">{{ edu.school }}</span>
-            </div>
-            <span class="experience-dates">{{ edu.dates }}</span>
-        </div>
-        {% if edu.highlights %}
-        <ul class="experience-bullets">
-            {% for highlight in edu.highlights %}
-            <li>{{ highlight }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-    </div>
-    {% endfor %}
-</div>
 {% endblock %}
