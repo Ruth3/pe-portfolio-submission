@@ -1,9 +1,9 @@
 """Flask application factory and route definitions."""
 
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for
 from dotenv import load_dotenv
-from app.constants import NAV_LINKS, PAGE_TITLES, HOBBIES
+from app.constants import NAV_LINKS, PAGE_TITLES, HOBBIES, EXPERIENCES, EDUCATION
 
 load_dotenv()
 app = Flask(__name__)
@@ -20,8 +20,7 @@ def inject_globals():
 
 @app.route("/")
 def index():
-    """Render the home page."""
-    return render_template("components/home.html", title=PAGE_TITLES["home"], active_page="home")
+    return redirect(url_for("about"))
 
 
 @app.route("/about")

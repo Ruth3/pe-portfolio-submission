@@ -2,23 +2,48 @@
 
 {% block content %}
 
-<div class="section-container">
-    <h2 class="section-title">Work Experience</h2>
-    {% for exp in experiences %}
+{% for person, label in [("ruth", "Ruth"), ("thrinayani", "Thrinayani")] %}
+<div class="exp-person-section">
+    <h2 class="exp-person-header">{{ label }}</h2>
+
+    <h3 class="exp-subsection-title">Education</h3>
+    {% for edu in education[person] %}
     <div class="experience-card">
         <div class="experience-header">
             <div>
-                <h3 class="experience-role">{{ exp.role }}</h3>
-                <span class="experience-company">{{ exp.company }}</span>
+                <h3 class="experience-role">{{ edu.degree }}</h3>
+                <span class="experience-company">{{ edu.school }} · {{ edu.location }}</span>
             </div>
-            <span class="experience-dates">{{ exp.dates }}</span>
+            <span class="experience-dates">{{ edu.status }}</span>
         </div>
+    </div>
+    {% endfor %}
+
+    <h3 class="exp-subsection-title">Work Experience</h3>
+    {% for exp in experiences[person] %}
+    <div class="experience-card">
+        <div class="experience-header">
+            <div class="experience-header-left">
+                <img src="/static/{{ exp.logo }}" alt="{{ exp.company }} logo" class="company-logo" onerror="this.style.display='none'" />
+                <div>
+                    <h3 class="experience-role">{{ exp.role }}</h3>
+                    <span class="experience-company">{{ exp.company }}</span>
+                </div>
+            </div>
+            <span class="experience-dates">
+                {% if exp.current %}<span class="exp-current-badge">Current</span>{% else %}{{ exp.dates }}{% endif %}
+            </span>
+        </div>
+        {% if exp.bullets %}
         <ul class="experience-bullets">
             {% for bullet in exp.bullets %}
             <li>{{ bullet }}</li>
             {% endfor %}
         </ul>
+        {% endif %}
     </div>
     {% endfor %}
 </div>
+{% endfor %}
+
 {% endblock %}
