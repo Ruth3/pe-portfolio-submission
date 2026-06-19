@@ -1,4 +1,308 @@
-{% extends "base.html" %}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  :root{
+    --bg:#fff8ef; --ink:#1b1d22; --muted:#6b6f76;
+    --accent:#ff5a3c; --accent2:#ffd23f; --blue:#3a86ff; --green:#2ec27e; --pink:#ff5d8f;
+    --card:#ffffff; --line:#1b1d22;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:"Roboto",system-ui,sans-serif;line-height:1.55}
+  h1,h2,h3{font-family:"Roboto",system-ui,sans-serif;font-weight:700;letter-spacing:-0.02em;margin:0 0 .4em}
+  h1{font-size:clamp(2rem,5vw,3.8rem);line-height:1}
+  h2{font-size:clamp(1.4rem,2.6vw,2.1rem);margin-top:0}
+  h3{font-size:1.15rem}
+  a{color:var(--accent)}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 24px}
 
-{% block content %}
-{% endblock %}
+  /* hero */
+  .hero{padding:16px 0 24px;text-align:center}
+  .hero .tag{display:inline-block;background:var(--accent2);border:2px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:600;font-size:.85rem;transform:rotate(-2deg)}
+  .hero p.lead{font-size:1.1rem;max-width:680px;margin:14px auto 0;color:#33363c}
+
+  /* profiles */
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:20px}
+  @media (max-width:820px){.duo{grid-template-columns:1fr}}
+  .person{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:24px;box-shadow:8px 8px 0 var(--line);position:relative}
+  .person.left{--c:var(--accent)}
+  .person.right{--c:var(--blue)}
+  .person .ribbon{position:absolute;top:-14px;left:20px;background:var(--c);color:#fff;border:2px solid var(--line);border-radius:999px;padding:4px 14px;font-weight:700;font-size:.8rem;letter-spacing:.04em;text-transform:uppercase}
+  .person-head{display:flex;gap:18px;align-items:center;margin-bottom:14px}
+  .avatar{width:96px;height:96px;border-radius:50%;border:3px solid var(--line);object-fit:cover;object-position:center center;background:var(--accent2);box-shadow:4px 4px 0 var(--line);flex-shrink:0;display:block}
+  .avatar--ruth{object-position:72% 30%}
+  .person-head h2{margin:0;font-size:1.5rem}
+  .person-head .sub{color:var(--muted);font-size:.9rem;margin-top:2px}
+  .person h3{margin-top:18px;color:var(--c);font-size:.95rem;text-transform:uppercase;letter-spacing:.06em;font-family:"Roboto",system-ui,sans-serif;font-weight:700}
+
+  ul.exp{list-style:none;padding:0;margin:0}
+  ul.exp li{padding:10px 0;border-bottom:1px dashed rgba(27,29,34,.15)}
+  ul.exp li:last-child{border-bottom:none}
+  ul.exp .role{font-weight:600}
+  ul.exp .org{color:var(--muted);font-size:.88rem}
+  .chips{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:.72rem;background:var(--accent2);border:1px solid var(--line);padding:2px 9px;border-radius:999px;font-weight:600}
+  .chip.now{background:var(--green);color:#fff}
+
+  /* sections */
+  section{padding:60px 0;border-top:2px dashed rgba(27,29,34,.18)}
+  .section-head{display:flex;align-items:baseline;gap:14px;margin-bottom:24px;flex-wrap:wrap;justify-content:center;text-align:center}
+  .section-head .num{font-family:"Roboto",system-ui,sans-serif;font-weight:700;color:var(--accent);font-size:1.1rem}
+
+  /* map */
+  #map{height:540px;width:100%;border:2px solid var(--line);border-radius:22px;box-shadow:8px 8px 0 var(--line);background:#cfe8ff;z-index:0}
+  .map-legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;color:var(--muted);font-size:.9rem;justify-content:center}
+  .leaflet-popup-content-wrapper{border-radius:14px;border:2px solid var(--line);box-shadow:5px 5px 0 var(--line);padding:0;overflow:hidden}
+  .leaflet-popup-content{margin:0;width:280px!important}
+  .pop .body{padding:10px 14px 14px}
+  .pop h4{margin:0 0 4px;font-family:"Roboto",system-ui,sans-serif;font-size:1.1rem;font-weight:700}
+  .pop p{margin:0;font-size:.85rem;color:var(--muted)}
+  .carousel{position:relative;background:#000}
+  .carousel-viewport{overflow:hidden;width:100%}
+  .carousel-track{display:flex;transition:transform .3s ease;will-change:transform}
+  .carousel-slide{flex:0 0 100%;min-width:100%}
+  .carousel-slide img{width:100%;height:160px;object-fit:cover;display:block}
+  .carousel-btn{position:absolute;top:50%;transform:translateY(-50%);width:28px;height:28px;border:2px solid var(--line);border-radius:50%;background:rgba(255,255,255,.92);color:var(--ink);font-size:1.1rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:2px 2px 0 var(--line);z-index:2}
+  .carousel-btn:hover{background:#fff}
+  .carousel-btn.prev{left:8px}
+  .carousel-btn.next{right:8px}
+  .carousel-dots{display:flex;justify-content:center;gap:6px;padding:8px 0 4px;background:#fff}
+  .carousel-dot{width:7px;height:7px;border-radius:50%;border:1px solid var(--line);background:rgba(27,29,34,.2);padding:0;cursor:pointer}
+  .carousel-dot.active{background:var(--accent)}
+  .emoji-pin{font-size:28px;text-align:center;line-height:1;filter:drop-shadow(2px 2px 0 #1b1d22);cursor:pointer;transition:transform .15s}
+  .emoji-pin:hover{transform:scale(1.25)}
+
+  footer{padding:50px 0 70px;text-align:center;color:var(--muted)}
+  footer .heart{color:var(--accent)}
+
+  /* navbar */
+  .nav-bar{width:100%;display:inline-block;background-color:#1C539F;font-family:"Roboto",system-ui,sans-serif;font-weight:700;padding-top:10px}
+  .nav-content{display:flex;align-items:center;justify-content:space-between;padding:0 30px}
+  .nav-content nav{display:flex;align-items:center;gap:10px}
+  .nav-content .nav-logo{height:60px;margin:auto;display:flex;align-items:center;justify-content:center}
+  .nav-logo img{width:200px}
+  .nav-link{color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:8px 14px;border-radius:4px;transition:background-color .2s}
+  .nav-link:hover,.nav-link.active{background-color:rgba(255,255,255,.2)}
+</style>
+</head>
+<body>
+
+{% include "components/navbar.html" %}
+
+<header class="hero">
+  <div class="wrap">
+    <h1>Hi, we're Ruth and Thrinayani!</h1>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- profiles -->
+  <section style="border-top:none;padding-top:10px">
+    <div class="duo">
+
+      <!-- ruth -->
+      <article class="person left">
+        <div class="person-head">
+          <img class="avatar avatar--ruth" src="/static/img/profiles/ruth.png" alt="Ruth Pérez">
+          <div>
+            <h2>Ruth Pérez</h2>
+          </div>
+        </div>
+
+        <p>I'm passionate about the intersection of life sciences and technology especially to help improve healthcare access and outcomes.</p>
+
+        <h3>Education</h3>
+        <ul class="exp">
+          <li>
+            <div class="role">B.A. in Biology &amp; Computer Science</div>
+            <div class="org">Brandeis University · Waltham, MA · Senior</div>
+          </li>
+        </ul>
+
+        <h3>Experience</h3>
+        <ul class="exp">
+          <li>
+            <div class="role">Machine Learning Research Intern</div>
+            <div class="org">MIT FMML</div>
+            <div class="chips"><span class="chip now">Current</span>
+          </li>
+          <li>
+            <div class="role">Software Engineer Intern - Robotics Simulation</div>
+            <div class="org">NVIDIA</div>
+          </li>
+          <li>
+            <div class="role">Research Intern - ICCAN team</div>
+            <div class="org">Memorial Sloan Kettering Cancer Center</div>
+          </li>
+          <li>
+            <div class="role">Teaching Assistant - ENGR 11A: Intro to Design Methodology</div>
+            <div class="org">Brandeis University</div>
+          </li>
+        </ul>
+      </article>
+
+      <!-- thrinayani -->
+      <article class="person right">
+        <div class="person-head">
+          <img class="avatar" src="/static/img/profiles/thrinayani.jpg" alt="Thrinayani">
+          <div>
+            <h2> Thrinayani</h2>
+          </div>
+        </div>
+
+        <p>Your description here.</p>
+
+        <h3>Education</h3>
+        <ul class="exp">
+          <li>
+            <div class="role">[Degree]</div>
+            <div class="org">[School · Location · Years]</div>
+          </li>
+        </ul>
+
+        <h3>Experience</h3>
+        <ul class="exp">
+          <li>
+            <div class="role">[Role]</div>
+            <div class="org">[Company]</div>
+            <div class="chips"><span class="chip">[skill]</span><span class="chip">[skill]</span></div>
+          </li>
+          <li>
+            <div class="role">[Role]</div>
+            <div class="org">[Company]</div>
+          </li>
+        </ul>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- map -->
+  <section>
+    <div class="section-head"><h2>Places we've been!</h2></div>
+    <div id="map" role="region" aria-label="Interactive map of places visited"></div>
+  </section>
+
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // travel photos in app/static/img/travel/<city>/
+  // jpg/jpeg only, heic won't show up in browser
+  const places = [
+    {
+      name:"Cartagena, Colombia", emoji:"📍", lat:10.3910, lng:-75.4794,
+      blurb:"Cooking classes, suprise kitten, and 5 island tour! ",
+      imgs:[
+        "/static/img/travel/cartagena/IMG_3996.JPEG",
+        "/static/img/travel/cartagena/IMG_5307.jpg",
+        "/static/img/travel/cartagena/IMG_5351.jpg",
+        "/static/img/travel/cartagena/IMG_5639.jpg"
+      ]
+    },
+    {
+      name:"San Juan, Puerto Rico", emoji:"📍", lat:18.4655, lng:-66.1057,
+      blurb:"Sea turles snorkeling, beaches, and Bistec Encebollado!",
+      imgs:[
+        "/static/img/travel/san-juan/IMG_0262.jpg",
+        "/static/img/travel/san-juan/IMG_0265.jpg",
+        "/static/img/travel/san-juan/IMG_0563_3.jpg",
+        "/static/img/travel/san-juan/IMG_0746.jpg"
+      ]
+    },
+    {
+      name:"Lima, Peru", emoji:"📍", lat:-12.0464, lng:-77.0428,
+      blurb:"Ruth's home country!",
+      imgs:[
+        "/static/img/travel/lima/DSC_0390.JPG",
+        "/static/img/travel/lima/DSC_0391.JPG",
+        "/static/img/travel/lima/DSC_0515.JPG",
+        "/static/img/travel/lima/IMG_3196.JPG"
+      ]
+    }
+  ];
+
+  function buildCarouselHtml(imgs, id) {
+    const slides = imgs.map(src =>
+      `<div class="carousel-slide"><img src="${src}" alt="" loading="lazy" onerror="this.style.display='none'"></div>`
+    ).join('');
+    const dots = imgs.map((_, i) =>
+      `<button type="button" class="carousel-dot${i === 0 ? ' active' : ''}" data-index="${i}" aria-label="Photo ${i + 1}"></button>`
+    ).join('');
+    return `
+      <div class="carousel" data-carousel="${id}">
+        <div class="carousel-viewport">
+          <div class="carousel-track">${slides}</div>
+        </div>
+        <button type="button" class="carousel-btn prev" aria-label="Previous photo">&#8249;</button>
+        <button type="button" class="carousel-btn next" aria-label="Next photo">&#8250;</button>
+        <div class="carousel-dots">${dots}</div>
+      </div>`;
+  }
+
+  function initCarousel(root) {
+    if (root.dataset.initialized) return;
+    root.dataset.initialized = 'true';
+
+    L.DomEvent.disableClickPropagation(root);
+    L.DomEvent.disableScrollPropagation(root);
+
+    const track = root.querySelector('.carousel-track');
+    const dots = root.querySelectorAll('.carousel-dot');
+    const prevBtn = root.querySelector('.carousel-btn.prev');
+    const nextBtn = root.querySelector('.carousel-btn.next');
+    const total = dots.length;
+    if (!track || total < 2) return;
+
+    let current = 0;
+    const viewport = root.querySelector('.carousel-viewport');
+    const goTo = (index) => {
+      current = (index + total) % total;
+      const slideWidth = viewport.offsetWidth;
+      track.style.transform = `translateX(-${current * slideWidth}px)`;
+      dots.forEach((dot, i) => dot.classList.toggle('active', i === current));
+    };
+
+    prevBtn.addEventListener('click', (e) => {
+      L.DomEvent.stop(e);
+      goTo(current - 1);
+    });
+    nextBtn.addEventListener('click', (e) => {
+      L.DomEvent.stop(e);
+      goTo(current + 1);
+    });
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', (e) => {
+        L.DomEvent.stop(e);
+        goTo(i);
+      });
+    });
+  }
+
+  const map = L.map('map', {scrollWheelZoom:true, worldCopyJump:true}).setView([0, -70], 3);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution:'&copy; OpenStreetMap &copy; CARTO',
+    maxZoom: 18
+  }).addTo(map);
+
+  places.forEach((p, i) => {
+    const icon = L.divIcon({className:'', html:`<div class="emoji-pin">${p.emoji}</div>`, iconSize:[32,32], iconAnchor:[16,28]});
+    const html = `<div class="pop">
+      ${buildCarouselHtml(p.imgs, i)}
+      <div class="body"><h4>${p.emoji} ${p.name}</h4><p>${p.blurb}</p></div>
+    </div>`;
+    const marker = L.marker([p.lat, p.lng], {icon}).addTo(map).bindPopup(html, {maxWidth:280});
+    marker.on('popupopen', (e) => {
+      const carousel = e.popup.getElement()?.querySelector('.carousel');
+      if (carousel) initCarousel(carousel);
+    });
+  });
+</script>
+</body>
+</html>
