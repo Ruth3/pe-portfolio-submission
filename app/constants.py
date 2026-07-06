@@ -191,16 +191,16 @@ PROJECTS = {
     ],
     "thrinayani": [
         {
-            "name": "[Project name]",
-            "description": "[What it does and why you liked building it]",
-            "image": "img/projects/thrinayani/project1.jpg",
-            "link": "",
+            "name": "Fast Marching Method — Ride the Wave",
+            "description": "Outperformed OpenCV's GraphCutSeamFinder and DPSeamFinder by implementing an FMM-based seam finder for optimal image seamlines. Solved the Eikonal equation over fused cost fields (color, edge, texture, saliency) for globally optimal seam paths.",
+            "image": "img/projects/thrinayani/fmm.png",
+            "link": "https://github.com/Thrinayani39e/Fast_Marching_Method_Ride_the_Wave",
         },
         {
-            "name": "[Project name]",
-            "description": "[Short description]",
-            "image": "img/projects/thrinayani/project2.jpg",
-            "link": "",
+            "name": "Distributed Rate Limiter Microservice",
+            "description": "Production-ready distributed rate-limiting backend implementing token bucket and sliding window algorithms via Redis. Full audit trail persisted to PostgreSQL, HTTP 429 enforcement with per-client analytics, and deployed via Docker Swarm with GitHub Actions CI/CD.",
+            "image": "img/projects/thrinayani/ratelimiter.png",
+            "link": "https://github.com/Thrinayani39e/rate-limiter-service",
         },
     ],
 }
