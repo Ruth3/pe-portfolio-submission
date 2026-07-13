@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fff8ef; --ink:#1b1d22; --muted:#6b6f76;
+    --accent:#ff5a3c; --accent2:#ffd23f; --blue:#3a86ff; --green:#2ec27e; --pink:#ff5d8f;
+    --card:#ffffff; --line:#1b1d22;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:"Roboto",system-ui,sans-serif;line-height:1.55}
+  h1,h2,h3{font-family:"Roboto",system-ui,sans-serif;font-weight:700;letter-spacing:-0.02em;margin:0 0 .4em}
+  h1{font-size:clamp(2rem,5vw,3.2rem);line-height:1}
+  h2{font-size:clamp(1.2rem,2.2vw,1.7rem);margin-top:0}
+  .wrap{max-width:800px;margin:0 auto;padding:0 24px}
+
+  .hero{padding:16px 0 24px;text-align:center}
+  .hero .tag{display:inline-block;background:var(--accent2);border:2px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:600;font-size:.85rem;transform:rotate(-2deg)}
+  .hero p.lead{font-size:1.05rem;max-width:600px;margin:14px auto 0;color:#33363c}
+
+  section{padding:30px 0}
+
+  /* form */
+  .post-form{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:24px;box-shadow:8px 8px 0 var(--line);margin-bottom:36px}
+  .post-form label{display:block;font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px}
+  .post-form input, .post-form textarea{width:100%;padding:10px 12px;border:2px solid var(--line);border-radius:10px;font-family:inherit;font-size:1rem;margin-bottom:16px;background:#fff}
+  .post-form textarea{resize:vertical;min-height:90px}
+  .post-form button{background:var(--accent);color:#fff;border:2px solid var(--line);border-radius:999px;padding:10px 26px;font-weight:700;font-size:1rem;cursor:pointer;box-shadow:4px 4px 0 var(--line);transition:transform .1s}
+  .post-form button:hover{transform:translate(-2px,-2px)}
+  .post-form button:disabled{opacity:.6;cursor:not-allowed}
+  .form-msg{font-size:.9rem;margin-top:-8px;margin-bottom:12px}
+  .form-msg.error{color:#d1322e}
+  .form-msg.success{color:var(--green)}
+
+  /* posts */
+  .post{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:6px 6px 0 var(--line);margin-bottom:18px;display:flex;gap:14px}
+  .post-avatar{width:52px;height:52px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;object-fit:cover;background:var(--accent2)}
+  .post-body{flex:1;min-width:0}
+  .post-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .post-name{font-weight:700}
+  .post-time{color:var(--muted);font-size:.82rem}
+  .post-content{margin-top:6px;white-space:pre-wrap;word-wrap:break-word}
+  .empty-state{text-align:center;color:var(--muted);padding:30px 0}
+
+  /* navbar (matches other pages) */
+  .nav-bar{width:100%;display:inline-block;background-color:#1C539F;font-family:"Roboto",system-ui,sans-serif;font-weight:700;padding-top:10px}
+  .nav-content{display:flex;align-items:center;justify-content:space-between;padding:0 30px}
+  .nav-content nav{display:flex;align-items:center;gap:10px}
+  .nav-content .nav-logo{height:60px;margin:auto;display:flex;align-items:center;justify-content:center}
+  .nav-logo img{width:200px}
+  .nav-link{color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:8px 14px;border-radius:4px;transition:background-color .2s}
+  .nav-link:hover,.nav-link.active{background-color:rgba(255,255,255,.2)}
+</style>
+</head>
+<body>
+
+{% include "components/navbar.html" %}
+
+<header class="hero">
+  <div class="wrap">
+    <span class="tag">Public Timeline</span>
+    <h1>Our School &amp; Career Journey</h1>
+    <p class="lead">Share an update, a milestone, or a lesson learned — it'll show up below for everyone to see.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section>
+    <form class="post-form" id="timeline-form">
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="content">What's on your mind?</label>
+      <textarea id="content" name="content" required></textarea>
+
+      <div id="form-msg" class="form-msg"></div>
+
+      <button type="submit" id="submit-btn">Post Update</button>
+    </form>
+
+    <div id="posts-container">
+      <p class="empty-state">Loading posts...</p>
+    </div>
+  </section>
+</main>
+
+<script>
+  const form = document.getElementById('timeline-form');
+  const postsContainer = document.getElementById('posts-container');
+  const formMsg = document.getElementById('form-msg');
+  const submitBtn = document.getElementById('submit-btn');
+
+  function md5(input) {
+    // Minimal MD5 implementation for Gravatar hashing (no external deps)
+    function rotateLeft(n, s) { return (n << s) | (n >>> (32 - s)); }
+    function toHex(n) {
+      let s = '', v;
+      for (let i = 0; i < 4; i++) {
+        v = (n >>> (i * 8)) & 255;
+        s += ('0' + v.toString(16)).slice(-2);
+      }
+      return s;
+    }
+    function utf8Encode(str) { return unescape(encodeURIComponent(str)); }
+
+    input = utf8Encode(input);
+    const K = [];
+    for (let i = 0; i < 64; i++) K[i] = Math.floor(Math.abs(Math.sin(i + 1)) * 4294967296);
+    const S = [7,12,17,22,7,12,17,22,7,12,17,22,7,12,17,22,
+               5,9,14,20,5,9,14,20,5,9,14,20,5,9,14,20,
+               4,11,16,23,4,11,16,23,4,11,16,23,4,11,16,23,
+               6,10,15,21,6,10,15,21,6,10,15,21,6,10,15,21];
+
+    let a0 = 0x67452301, b0 = 0xefcdab89, c0 = 0x98badcfe, d0 = 0x10325476;
+
+    const bytes = [];
+    for (let i = 0; i < input.length; i++) bytes.push(input.charCodeAt(i));
+    const origLenBits = bytes.length * 8;
+    bytes.push(0x80);
+    while (bytes.length % 64 !== 56) bytes.push(0);
+    for (let i = 0; i < 8; i++) bytes.push((origLenBits / Math.pow(2, i * 8)) & 255);
+
+    for (let chunkStart = 0; chunkStart < bytes.length; chunkStart += 64) {
+      const M = [];
+      for (let j = 0; j < 16; j++) {
+        M[j] = bytes[chunkStart + j*4] | (bytes[chunkStart + j*4+1] << 8) |
+               (bytes[chunkStart + j*4+2] << 16) | (bytes[chunkStart + j*4+3] << 24);
+      }
+      let A = a0, B = b0, C = c0, D = d0;
+      for (let i = 0; i < 64; i++) {
+        let F, g;
+        if (i < 16) { F = (B & C) | (~B & D); g = i; }
+        else if (i < 32) { F = (D & B) | (~D & C); g = (5*i + 1) % 16; }
+        else if (i < 48) { F = B ^ C ^ D; g = (3*i + 5) % 16; }
+        else { F = C ^ (B | ~D); g = (7*i) % 16; }
+        F = (F + A + K[i] + M[g]) | 0;
+        A = D; D = C; C = B;
+        B = (B + rotateLeft(F, S[i])) | 0;
+      }
+      a0 = (a0 + A) | 0; b0 = (b0 + B) | 0; c0 = (c0 + C) | 0; d0 = (d0 + D) | 0;
+    }
+    return toHex(a0) + toHex(b0) + toHex(c0) + toHex(d0);
+  }
+
+  function gravatarUrl(email) {
+    const hash = md5(email.trim().toLowerCase());
+    return `https://www.gravatar.com/avatar/${hash}?d=identicon&s=80`;
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function renderPosts(posts) {
+    if (!posts.length) {
+      postsContainer.innerHTML = '<p class="empty-state">No timeline posts yet. Be the first to share!</p>';
+      return;
+    }
+    postsContainer.innerHTML = posts.map(post => `
+      <div class="post">
+        <img class="post-avatar" src="${gravatarUrl(post.email)}" alt="${escapeHtml(post.name)}'s avatar">
+        <div class="post-body">
+          <div class="post-head">
+            <span class="post-name">${escapeHtml(post.name)}</span>
+            <span class="post-time">${new Date(post.created_at).toLocaleString()}</span>
+          </div>
+          <div class="post-content">${escapeHtml(post.content)}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function fetchPosts() {
+    try {
+      const res = await fetch('/api/timeline_post');
+      const posts = await res.json();
+      renderPosts(posts);
+    } catch (err) {
+      postsContainer.innerHTML = '<p class="empty-state">Could not load posts. Please try again later.</p>';
+    }
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    formMsg.textContent = '';
+    formMsg.className = 'form-msg';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Posting...';
+
+    const payload = {
+      name: document.getElementById('name').value,
+      email: document.getElementById('email').value,
+      content: document.getElementById('content').value,
+    };
+
+    try {
+      const res = await fetch('/api/timeline_post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('Request failed');
+
+      form.reset();
+      formMsg.textContent = 'Posted!';
+      formMsg.classList.add('success');
+      await fetchPosts();
+    } catch (err) {
+      formMsg.textContent = 'Something went wrong. Please try again.';
+      formMsg.classList.add('error');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Post Update';
+    }
+  });
+
+  fetchPosts();
+</script>
+
+</body>
+</html>

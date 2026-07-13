@@ -10,6 +10,7 @@ NAV_LINKS = [
     {"label": "Experience", "href": "/experience",  "key": "experience"},
     {"label": "Projects",   "href": "/projects",    "key": "projects"},
     {"label": "Hobbies",    "href": "/hobbies",     "key": "hobbies"},
+    {"label": "Timeline",   "href": "/timeline",    "key": "timeline"},
 ]
 
 PAGE_TITLES = {
@@ -18,6 +19,7 @@ PAGE_TITLES = {
     "experience": "Experience",
     "projects":   "Projects",
     "hobbies":    "Hobbies",
+    "timeline":   "Timeline",
 }
 
 EDUCATION = {
