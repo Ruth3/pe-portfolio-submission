@@ -1,6 +1,7 @@
 """Flask application factory and route definitions."""
 
 import os
+import re
 import datetime
 from flask import Flask, render_template, redirect, url_for, request, jsonify
 from dotenv import load_dotenv
@@ -95,14 +96,26 @@ def timeline():
     """Render the timeline page."""
     return render_template("timeline.html", title="Timeline", active_page="timeline")
 
+EMAIL_RE = re.compile(r"[^@]+@[^@]+\.[^@]+")
+
+
 @app.route("/api/timeline_post", methods=["POST"])
 def create_timeline_post():
-    data = request.get_json()
-    post = TimelinePost.create(
-        name=data.get("name"),
-        email=data.get("email"),
-        content=data.get("content"),
-    )
+    # accept either JSON (used by the timeline page) or form-encoded data
+    data = request.get_json(silent=True) or request.form
+
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip()
+    content = (data.get("content") or "").strip()
+
+    if not name:
+        return "Invalid name", 400
+    if not content:
+        return "Invalid content", 400
+    if not EMAIL_RE.fullmatch(email):
+        return "Invalid email", 400
+
+    post = TimelinePost.create(name=name, email=email, content=content)
     return jsonify(model_to_dict(post)), 201
 
 
