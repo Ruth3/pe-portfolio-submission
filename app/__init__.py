@@ -11,13 +11,17 @@ from app.constants import NAV_LINKS, PAGE_TITLES, HOBBIES, PROJECTS, EXPERIENCES
 load_dotenv()
 app = Flask(__name__)
 
-database = MySQLDatabase(
-    os.getenv("MYSQL_DATABASE"),
-    user=os.getenv("MYSQL_USER"),
-    password=os.getenv("MYSQL_PASSWORD"),
-    host=os.getenv("MYSQL_HOST"),
-    port=3306,
-)
+if os.getenv("TESTING") == "true":
+    print("Running in test mode")
+    database = SqliteDatabase('file:memory?mode=memory&cache=shared',uri=True)
+else:
+    database = MySQLDatabase(
+        os.getenv("MYSQL_DATABASE"),
+        user=os.getenv("MYSQL_USER"),
+        password=os.getenv("MYSQL_PASSWORD"),
+        host=os.getenv("MYSQL_HOST"),
+        port=3306,
+    )
 
 
 class TimelinePost(Model):
