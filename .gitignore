@@ -5,3 +5,12 @@ __pycache__
 python3-virtualenv
 flask.sqlite
 .DS_Storeflask.log
+
+.env
+venv/
+__pycache__/
+*.pyc
+app/__init__.py.broken
+FETCH_HEAD
+ql -u root
+.env.backup

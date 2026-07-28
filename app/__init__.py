@@ -12,11 +12,7 @@ from app.constants import NAV_LINKS, PAGE_TITLES, HOBBIES, PROJECTS, EXPERIENCES
 load_dotenv()
 app = Flask(__name__)
 
-if os.getenv("TESTING") == "true":
-    print("Running in test mode")
-    database = SqliteDatabase('file:memory?mode=memory&cache=shared',uri=True)
-else:
-    if os.getenv("TESTING", "").lower() == "true":
+if os.getenv("TESTING", "").lower() == "true":
     database = SqliteDatabase(":memory:")
 else:
     database = MySQLDatabase(
