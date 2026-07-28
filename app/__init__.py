@@ -16,6 +16,9 @@ if os.getenv("TESTING") == "true":
     print("Running in test mode")
     database = SqliteDatabase('file:memory?mode=memory&cache=shared',uri=True)
 else:
+    if os.getenv("TESTING", "").lower() == "true":
+    database = SqliteDatabase(":memory:")
+else:
     database = MySQLDatabase(
         os.getenv("MYSQL_DATABASE"),
         user=os.getenv("MYSQL_USER"),
