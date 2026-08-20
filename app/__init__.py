@@ -95,6 +95,27 @@ def timeline():
     """Render the timeline page."""
     return render_template("timeline.html", title="Timeline", active_page="timeline")
 
+@app.route("/health")
+def health():
+    """Check that the application and database are responding."""
+    try:
+        if database.is_closed():
+            database.connect(reuse_if_open=True)
+
+        post_count = TimelinePost.select().count()
+
+        return jsonify({
+            "status": "ok",
+            "database": "connected",
+            "timeline_posts": post_count
+        }), 200
+
+    except Exception:
+        return jsonify({
+            "status": "error",
+            "database": "unavailable"
+        }), 503
+
 EMAIL_RE = re.compile(r"[^@]+@[^@]+\.[^@]+")
 
 
