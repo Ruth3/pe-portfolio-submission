@@ -102,12 +102,11 @@ def health():
         if database.is_closed():
             database.connect(reuse_if_open=True)
 
-        post_count = TimelinePost.select().count()
+        database.execute_sql("SELECT 1")
 
         return jsonify({
             "status": "ok",
-            "database": "connected",
-            "timeline_posts": post_count
+            "database": "connected"
         }), 200
 
     except Exception:
